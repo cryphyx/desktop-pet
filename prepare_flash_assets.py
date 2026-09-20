@@ -8,21 +8,14 @@ from PIL import Image, ImageFilter
 ROOT = Path(__file__).resolve().parent
 ASSETS = ROOT / "assets"
 NORMAL_MASTER = ROOT / "generated" / "flash-girl-normal-master-blue-green-v6.png"
-FULL_MASTER = ROOT / "generated" / "flash-girl-full-master-blue-green-v3.png"
 NORMAL_BLINK = ROOT / "generated" / "flash-girl-normal-blink-blue-green-v6.png"
-FULL_BLINK = ROOT / "generated" / "flash-girl-full-blink-blue-green-v3.png"
 STAND_NORMAL_MASTER = ROOT / "generated" / "flash-girl-stand-normal-master-blue-green-v2.png"
-STAND_FULL_MASTER = ROOT / "generated" / "flash-girl-stand-full-master-blue-green-v3.png"
 STAND_NORMAL_BLINK = ROOT / "generated" / "flash-girl-stand-normal-blink-blue-green-v2.png"
-STAND_FULL_BLINK = ROOT / "generated" / "flash-girl-stand-full-blink-blue-green-v3.png"
 ACTIONS = ROOT / "generated" / "flash-girl-actions-blue-green.png"
 EXTRA = ROOT / "generated" / "flash-girl-poses-blue-green.png"
 NORMAL_KNEAD = ROOT / "generated" / "flash-girl-knead-normal-blue-green.png"
-FULL_KNEAD = ROOT / "generated" / "flash-girl-knead-full-blue-green-v2.png"
-READ_FULL = ROOT / "generated" / "flash-girl-read-full-blue-green-v1.png"
 READ_NORMAL = ROOT / "generated" / "flash-girl-read-normal-hd-v5.png"
 TYPING_NORMAL = ROOT / "generated" / "flash-girl-typing-normal-blue-green-v1.png"
-TYPING_FULL = ROOT / "generated" / "flash-girl-typing-full-blue-green-v1.png"
 CELL = (1024, 1108)
 THEMES = {
     "original": (0, 1.0, 1.0),
@@ -295,60 +288,39 @@ def load_source_with_alpha(path: Path) -> Image.Image:
 
 def main() -> None:
     normal_master_sheet = load_source_with_alpha(NORMAL_MASTER)
-    full_master_sheet = load_source_with_alpha(FULL_MASTER)
     normal_blink_sheet = load_source_with_alpha(NORMAL_BLINK)
-    full_blink_sheet = load_source_with_alpha(FULL_BLINK)
     stand_normal_master_sheet = load_source_with_alpha(STAND_NORMAL_MASTER)
-    stand_full_master_sheet = load_source_with_alpha(STAND_FULL_MASTER)
     stand_normal_blink_sheet = load_source_with_alpha(STAND_NORMAL_BLINK)
-    stand_full_blink_sheet = load_source_with_alpha(STAND_FULL_BLINK)
     action_sheet = load_source_with_alpha(ACTIONS)
     extra_sheet = load_source_with_alpha(EXTRA)
     normal_knead_sheet = load_source_with_alpha(NORMAL_KNEAD)
-    full_knead_sheet = load_source_with_alpha(FULL_KNEAD)
-    read_full_sheet = load_source_with_alpha(READ_FULL)
     read_normal_sheet = load_source_with_alpha(READ_NORMAL)
     typing_normal_sheet = load_source_with_alpha(TYPING_NORMAL)
-    typing_full_sheet = load_source_with_alpha(TYPING_FULL)
     normal_master = extract_cell(normal_master_sheet, 1, 1, 0, 0)
-    full_master = extract_cell(full_master_sheet, 1, 1, 0, 0)
     normal_blink = [[extract_cell(normal_blink_sheet, 2, 2, col, row) for col in range(2)] for row in range(2)]
-    full_blink = [[extract_cell(full_blink_sheet, 2, 2, col, row) for col in range(2)] for row in range(2)]
     stand_normal_master = extract_cell(stand_normal_master_sheet, 1, 1, 0, 0)
-    stand_full_master = extract_cell(stand_full_master_sheet, 1, 1, 0, 0)
     stand_normal_blink = [[extract_cell(stand_normal_blink_sheet, 2, 2, col, row) for col in range(2)] for row in range(2)]
-    stand_full_blink = [[extract_cell(stand_full_blink_sheet, 2, 2, col, row) for col in range(2)] for row in range(2)]
     action = [[extract_cell(action_sheet, 2, 2, col, row) for col in range(2)] for row in range(2)]
     extra = [[extract_cell(extra_sheet, 2, 2, col, row) for col in range(2)] for row in range(2)]
     normal_knead = [[extract_cell(normal_knead_sheet, 2, 2, col, row) for col in range(2)] for row in range(2)]
-    full_knead = [[extract_cell(full_knead_sheet, 2, 2, col, row) for col in range(2)] for row in range(2)]
-    read_full = extract_cell(read_full_sheet, 1, 1, 0, 0)
     read_normal = extract_cell(read_normal_sheet, 1, 1, 0, 0)
     typing_normal = [[extract_cell(typing_normal_sheet, 2, 2, col, row) for col in range(2)] for row in range(2)]
-    typing_full = [[extract_cell(typing_full_sheet, 2, 2, col, row) for col in range(2)] for row in range(2)]
 
     row_frames = {
         0: [normal_master],
         1: [normal_blink[0][0], normal_blink[0][1], normal_blink[1][0], normal_blink[1][1]],
-        2: [full_master],
-        3: [full_blink[0][0], full_blink[0][1], full_blink[1][0], full_blink[1][1]],
-        4: [stand_normal_master],
-        5: [stand_normal_blink[0][0], stand_normal_blink[0][1], stand_normal_blink[1][0], stand_normal_blink[1][1]],
-        6: [stand_full_master],
-        7: [stand_full_blink[0][0], stand_full_blink[0][1], stand_full_blink[1][0], stand_full_blink[1][1]],
-        8: [action[0][0]] * 4,
-        9: [action[0][1]] * 5,
-        10: [normal_knead[0][0], normal_knead[0][1], normal_knead[1][0], normal_knead[1][1]],
-        11: [full_knead[0][0], full_knead[0][1], full_knead[1][0], full_knead[1][1]],
-        12: [typing_normal[0][0], typing_normal[0][1], typing_normal[1][0], typing_normal[1][1]],
-        13: [typing_full[0][0], typing_full[0][1], typing_full[1][0], typing_full[1][1]],
+        2: [stand_normal_master],
+        3: [stand_normal_blink[0][0], stand_normal_blink[0][1], stand_normal_blink[1][0], stand_normal_blink[1][1]],
+        4: [action[0][0]] * 4,
+        5: [action[0][1]] * 5,
+        6: [normal_knead[0][0], normal_knead[0][1], normal_knead[1][0], normal_knead[1][1]],
+        7: [typing_normal[0][0], typing_normal[0][1], typing_normal[1][0], typing_normal[1][1]],
     }
     pose_images = {
         "bow": action[1][0],
         "shy": action[1][1],
         "dance": extra[0][0],
         "read": read_normal,
-        "read_full": read_full,
         "tea": extra[1][0],
         "sit_smile": extra[1][1],
     }

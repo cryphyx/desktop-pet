@@ -38,36 +38,24 @@ DISPLAY_H = 554
 ROWS = {
     "sit_normal_idle": (0, 1),
     "sit_normal_blink": (1, 4),
-    "sit_full_idle": (2, 1),
-    "sit_full_blink": (3, 4),
-    "stand_normal_idle": (4, 1),
-    "stand_normal_blink": (5, 4),
-    "stand_full_idle": (6, 1),
-    "stand_full_blink": (7, 4),
-    "waving": (8, 4),
-    "jumping": (9, 5),
-    "normal_knead": (10, 4),
-    "full_knead": (11, 4),
-    "typing_normal": (12, 4),
-    "typing_full": (13, 4),
+    "stand_normal_idle": (2, 1),
+    "stand_normal_blink": (3, 4),
+    "waving": (4, 4),
+    "jumping": (5, 5),
+    "normal_knead": (6, 4),
+    "typing_normal": (7, 4),
 }
 FRAME_MS = {
     "sit_normal_idle": 260,
     "sit_normal_blink": 135,
-    "sit_full_idle": 260,
-    "sit_full_blink": 135,
     "stand_normal_idle": 260,
     "stand_normal_blink": 135,
-    "stand_full_idle": 260,
-    "stand_full_blink": 135,
     "waving": 150,
     "jumping": 110,
     "normal_knead": 180,
-    "full_knead": 180,
     "typing_normal": 155,
-    "typing_full": 155,
 }
-POSES = ("bow", "sit_smile", "shy", "dance", "read", "read_full", "tea")
+POSES = ("bow", "sit_smile", "shy", "dance", "read", "tea")
 THEMES = {
     "original": "浅蓝星光",
 }
@@ -134,7 +122,6 @@ class YuliDeluxeQt(QWidget):
         self.form = self.settings.get("form", "human")
         if self.form not in {"human", "cat"}:
             self.form = "human"
-        self.full_meal_state = bool(self.settings.get("full_meal_state", False))
         self.stats_light_text = bool(self.settings.get("stats_light_text", False))
         self.posture = self.settings.get("posture", "sitting")
         if self.posture not in {"sitting", "standing"}:
@@ -175,17 +162,16 @@ class YuliDeluxeQt(QWidget):
         self.resize(self.display_width, self.display_height)
         self.move(self.window_x, self.window_y)
 
-        meal_key = "full" if self.full_meal_state else "normal"
         if self.form == "cat":
             self.visual_type, self.visual_name = "cat", "idle"
         elif self.activity_state == "reading":
             self.visual_type = "pose"
-            self.visual_name = "read_full" if self.full_meal_state else "read"
+            self.visual_name = "read"
         elif self.activity_state == "typing":
-            self.visual_type, self.visual_name = "base", f"typing_{meal_key}"
+            self.visual_type, self.visual_name = "base", "typing_normal"
         else:
             posture_key = "sit" if self.activity_state == "sitting" else "stand"
-            self.visual_type, self.visual_name = "base", f"{posture_key}_{meal_key}_idle"
+            self.visual_type, self.visual_name = "base", f"{posture_key}_normal_idle"
         self.frame = 0
         self.frame_phase = 0
         self.last_tick = time.monotonic()
@@ -286,11 +272,6 @@ class YuliDeluxeQt(QWidget):
         form_menu.addAction("少女形态", lambda: self.transform("human"))
         form_menu.addAction("胖乎乎银蓝小猫", lambda: self.transform("cat"))
 
-        self.full_meal_action = self.menu.addAction("吃饱饭状态（持续）")
-        self.full_meal_action.setCheckable(True)
-        self.full_meal_action.setChecked(self.full_meal_state)
-        self.full_meal_action.triggered.connect(self.toggle_full_meal_state)
-
         tools = self.menu.addMenu("系统工具")
         self.stats_actions: dict[str, QAction] = {}
         for key, label in (
@@ -369,7 +350,7 @@ class YuliDeluxeQt(QWidget):
                 max(1, round(self.display_height * dpr)),
             )
             image = display_frame(source, pixel_size)
-            if self.visual_type == "pose" and self.visual_name in {"read", "read_full"}:
+            if self.visual_type == "pose" and self.visual_name == "read":
                 # Move by a whole output pixel, not a fraction of a downsampled
                 # source pixel; breathing therefore keeps the same sharpness.
                 offset = (0, -1, -1, 0)[self.frame_phase % 4]
@@ -402,14 +383,12 @@ class YuliDeluxeQt(QWidget):
 
     def play_blink(self) -> None:
         posture_key = "sit" if self.posture == "sitting" else "stand"
-        meal_key = "full" if self.full_meal_state else "normal"
-        state = f"{posture_key}_{meal_key}_blink"
+        state = f"{posture_key}_normal_blink"
         self.play_base(state, 680)
         self.next_blink = time.monotonic() + random.uniform(4.0, 8.0)
 
     def play_belly_knead(self) -> None:
-        state = "full_knead" if self.full_meal_state else "normal_knead"
-        self.play_base(state, 1800)
+        self.play_base("normal_knead", 1800)
 
     def play_pose(self, name: str, duration_ms: int = 1400) -> None:
         if self.form == "cat":
@@ -434,14 +413,12 @@ class YuliDeluxeQt(QWidget):
             self.visual_type, self.visual_name = "cat", "idle"
         elif self.activity_state == "reading":
             self.visual_type = "pose"
-            self.visual_name = "read_full" if self.full_meal_state else "read"
+            self.visual_name = "read"
         elif self.activity_state == "typing":
-            meal_key = "full" if self.full_meal_state else "normal"
-            self.visual_type, self.visual_name = "base", f"typing_{meal_key}"
+            self.visual_type, self.visual_name = "base", "typing_normal"
         else:
             posture_key = "sit" if self.activity_state == "sitting" else "stand"
-            meal_key = "full" if self.full_meal_state else "normal"
-            state = f"{posture_key}_{meal_key}_idle"
+            state = f"{posture_key}_normal_idle"
             self.visual_type, self.visual_name = "base", state
         self.frame = self.frame_phase = 0
         self.render()
@@ -597,11 +574,6 @@ class YuliDeluxeQt(QWidget):
     def type_continuously(self) -> None:
         self.activity_state = "typing"
         self.typing_action.setChecked(True)
-        self.set_idle()
-        self.save_settings()
-
-    def toggle_full_meal_state(self, checked: bool) -> None:
-        self.full_meal_state = bool(checked)
         self.set_idle()
         self.save_settings()
 
@@ -775,7 +747,6 @@ class YuliDeluxeQt(QWidget):
             "size_percent": self.size_percent,
             "theme": self.theme,
             "form": self.form,
-            "full_meal_state": self.full_meal_state,
             "stats_light_text": self.stats_light_text,
             "posture": self.posture,
             "activity_state": self.activity_state,

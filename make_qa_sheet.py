@@ -17,66 +17,24 @@ def thumb(image: Image.Image) -> Image.Image:
 def main() -> None:
     items = []
     original_atlas = Image.open(ASSETS / "atlases" / "original.png").convert("RGBA")
-    items.append(("sit_normal_idle_hd", original_atlas.crop((0, 0, *HD_CELL))))
-    for frame in range(4):
-        left = frame * HD_CELL[0]
-        top = 1 * HD_CELL[1]
-        items.append(
-            (
-                f"sit_normal_blink_{frame + 1}",
-                original_atlas.crop((left, top, left + HD_CELL[0], top + HD_CELL[1])),
-            )
-        )
-    items.append(("sit_full_idle_hd", original_atlas.crop((0, 2 * HD_CELL[1], HD_CELL[0], 3 * HD_CELL[1]))))
-    items.append(("stand_normal_idle_hd", original_atlas.crop((0, 4 * HD_CELL[1], HD_CELL[0], 5 * HD_CELL[1]))))
-    items.append(("stand_full_idle_hd", original_atlas.crop((0, 6 * HD_CELL[1], HD_CELL[0], 7 * HD_CELL[1]))))
-    for frame in range(4):
-        left = frame * HD_CELL[0]
-        top = 5 * HD_CELL[1]
-        items.append(
-            (
-                f"stand_normal_blink_{frame + 1}",
-                original_atlas.crop((left, top, left + HD_CELL[0], top + HD_CELL[1])),
-            )
-        )
-    for frame in range(4):
-        left = frame * HD_CELL[0]
-        top = 7 * HD_CELL[1]
-        items.append(
-            (
-                f"stand_full_blink_{frame + 1}",
-                original_atlas.crop((left, top, left + HD_CELL[0], top + HD_CELL[1])),
-            )
-        )
-    for frame in range(4):
-        left = frame * HD_CELL[0]
-        top = 10 * HD_CELL[1]
-        items.append(
-            (
-                f"normal_knead_{frame + 1}",
-                original_atlas.crop((left, top, left + HD_CELL[0], top + HD_CELL[1])),
-            )
-        )
-    for frame in range(4):
-        left = frame * HD_CELL[0]
-        top = 11 * HD_CELL[1]
-        items.append(
-            (
-                f"full_knead_{frame + 1}",
-                original_atlas.crop((left, top, left + HD_CELL[0], top + HD_CELL[1])),
-            )
-        )
-    for row, label in ((12, "typing_normal"), (13, "typing_full")):
-        for frame in range(4):
+    for row, label, count in (
+        (0, "sit_idle", 1),
+        (1, "sit_blink", 4),
+        (2, "stand_idle", 1),
+        (3, "stand_blink", 4),
+        (4, "wave", 4),
+        (5, "jump", 5),
+        (6, "knead", 4),
+        (7, "typing", 4),
+    ):
+        for frame in range(count):
             left = frame * HD_CELL[0]
             top = row * HD_CELL[1]
-            items.append(
-                (
-                    f"{label}_{frame + 1}",
-                    original_atlas.crop((left, top, left + HD_CELL[0], top + HD_CELL[1])),
-                )
-            )
-    for name in ("bow", "sit_smile", "shy", "dance", "read", "read_full", "tea"):
+            items.append((
+                f"{label}_{frame + 1}",
+                original_atlas.crop((left, top, left + HD_CELL[0], top + HD_CELL[1])),
+            ))
+    for name in ("bow", "sit_smile", "shy", "dance", "read", "tea"):
         items.append((name, Image.open(ASSETS / "poses" / "original" / f"{name}.png").convert("RGBA")))
     for name in ("idle", "shy"):
         items.append(
